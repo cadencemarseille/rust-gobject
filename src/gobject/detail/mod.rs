@@ -6,9 +6,4 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#[link(name = "gobject", vers = "0.1")];
-#[crate_type = "lib"];
-
-extern mod glib;
-
-pub mod detail;
+mod native;

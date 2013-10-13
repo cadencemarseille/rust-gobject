@@ -9,3 +9,4 @@
 /libtest~
 /src/gi/detail/native.rs
 /src/glib
+/src/gobject/detail/native.rs
