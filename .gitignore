@@ -1,0 +1,10 @@
+*.dSYM
+*.dylib
+.DS_Store
+
+/.rust
+/bin
+/build
+/lib
+/libtest~
+/src/glib
