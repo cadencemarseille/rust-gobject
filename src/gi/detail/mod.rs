@@ -6,4 +6,19 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use gobject::detail::GObject;
+
 mod native;
+
+pub struct GIRepositoryPrivate;
+
+pub struct GIRepository {
+    parent: GObject,
+
+    priv priv_: *mut GIRepositoryPrivate
+}
+
+pub fn g_irepository_get_default() -> *mut GIRepository {
+    #[fixed_stack_segment]; #[inline(never)];
+    unsafe { native::g_irepository_get_default() }
+}

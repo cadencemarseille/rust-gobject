@@ -6,4 +6,40 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use glib;
+use std::ptr;
+
 mod native;
+
+pub type GType = glib::gsize;
+
+pub struct GData;
+
+pub struct GTypeClass {
+    priv g_type: GType
+}
+
+pub struct GObject {
+    g_type_instance: GTypeClass,
+
+    priv ref_count: glib::guint,
+    priv qdata: *mut GData
+}
+
+pub fn g_object_ref(object: glib::gpointer) -> glib::gpointer {
+    #[fixed_stack_segment]; #[inline(never)];
+    assert!(ptr::is_not_null(object));
+    unsafe { native::g_object_ref(object) }
+}
+
+pub fn g_object_ref_sink(object: glib::gpointer) -> glib::gpointer {
+    #[fixed_stack_segment]; #[inline(never)];
+    assert!(ptr::is_not_null(object));
+    unsafe { native::g_object_ref_sink(object) }
+}
+
+pub fn g_object_unref(object: glib::gpointer) {
+    #[fixed_stack_segment]; #[inline(never)];
+    assert!(ptr::is_not_null(object));
+    unsafe { native::g_object_unref(object) }
+}

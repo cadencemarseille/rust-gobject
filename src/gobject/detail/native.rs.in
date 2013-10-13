@@ -6,6 +6,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use glib;
+
 #[link_args = "@GOBJECT_LIBS@"]
 extern {
+    fn g_object_ref(object: glib::gpointer) -> glib::gpointer;
+    fn g_object_ref_sink(object: glib::gpointer) -> glib::gpointer;
+    fn g_object_unref(object: glib::gpointer);
 }

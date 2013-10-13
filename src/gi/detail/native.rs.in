@@ -8,4 +8,5 @@
 
 #[link_args = "@GOBJECT_INTROSPECTION_LIBS@"]
 extern {
+    fn g_irepository_get_default() -> *mut ::detail::GIRepository;
 }
