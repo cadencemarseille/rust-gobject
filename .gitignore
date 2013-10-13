@@ -7,4 +7,5 @@
 /build
 /lib
 /libtest~
+/src/gi/detail/native.rs
 /src/glib

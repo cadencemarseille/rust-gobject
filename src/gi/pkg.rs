@@ -51,8 +51,8 @@ fn do_install(args: ~[~str]) {
     let workspace_path = os::getcwd();
 
     let src_path = workspace_path.push("src");
-    let native_detail_src_path = src_path.push("gi").push("detail").push("native");
-    let paths_to_substitute = [];
+    let detail_src_path = src_path.push("gi").push("detail");
+    let paths_to_substitute = [detail_src_path.push("native.rs.in")];
     for path_to_substitute in paths_to_substitute.iter() {
         if !os::path_exists(path_to_substitute) {
             fail2!("Package script error: Source file `{}` does not exist.", path_to_substitute.to_str());
