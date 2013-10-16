@@ -22,7 +22,7 @@ pub struct Repository {
 }
 
 impl Repository {
-    fn default() -> Repository {
+    pub fn default() -> Repository {
         Repository {
             ptr: detail::g_irepository_get_default() as *detail::GIRepository,
             owns: false
