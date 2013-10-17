@@ -6,7 +6,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use glib;
+
 #[link_args = "@GOBJECT_INTROSPECTION_LIBS@"]
 extern {
     fn g_irepository_get_default() -> *mut ::detail::GIRepository;
+    fn g_irepository_get_loaded_namespaces(repository: *::detail::GIRepository) -> *mut *mut glib::gchar;
 }

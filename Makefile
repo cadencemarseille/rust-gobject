@@ -7,3 +7,4 @@ install:
 	rustpkg build glib
 	rustpkg install gobject
 	rustpkg install gi
+	rustpkg install rustgigen

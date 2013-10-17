@@ -12,12 +12,14 @@
 extern mod glib;
 extern mod gobject;
 
+use glib::strfuncs::Strdupv;
 use std::ptr;
+use std::str;
 
 mod detail;
 
 pub struct Repository {
-    priv ptr: *detail::GIRepository,
+    priv ptr: *mut detail::GIRepository,
     priv owns: bool
 }
 
@@ -25,9 +27,28 @@ impl Repository {
     pub fn default() -> Repository {
         unsafe {
             Repository {
-                ptr: detail::g_irepository_get_default() as *detail::GIRepository,
+                ptr: detail::g_irepository_get_default(),
                 owns: false
             }
+        }
+    }
+
+    pub fn loaded_namespaces(&self) -> ~[~str] {
+        unsafe {
+            let mut res: ~[~str] = ~[];
+            let mut namespaces_strdupv = Strdupv::new(detail::g_irepository_get_loaded_namespaces(self.ptr as *detail::GIRepository));
+            do namespaces_strdupv.with_mut_ptr |namespaces_array| {
+                let mut p = namespaces_array;
+                loop {
+                    let namespace_c_str = ptr::read_ptr(p);
+                    if ptr::is_null(namespace_c_str) {
+                        break;
+                    }
+                    res.push(str::raw::from_c_str(namespace_c_str as *glib::gchar));
+                    p = ptr::mut_offset(p, 1);
+                }
+            };
+            res
         }
     }
 }
@@ -36,9 +57,9 @@ impl Drop for Repository {
     fn drop(&mut self) {
         unsafe {
             if self.owns {
-                gobject::detail::g_object_unref(self.ptr as *mut detail::GIRepository as glib::gpointer);
+                gobject::detail::g_object_unref(self.ptr as glib::gpointer);
             }
-            self.ptr = ptr::null();
+            self.ptr = ptr::mut_null();
             self.owns = false;
         }
     }

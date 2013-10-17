@@ -8,6 +8,8 @@
 
 use gobject::detail::GObject;
 
+use glib;
+
 mod native;
 
 pub struct GIRepositoryPrivate;
@@ -21,4 +23,9 @@ pub struct GIRepository {
 pub unsafe fn g_irepository_get_default() -> *mut GIRepository {
     #[fixed_stack_segment]; #[inline(never)];
     native::g_irepository_get_default()
+}
+
+pub unsafe fn g_irepository_get_loaded_namespaces(repository: *GIRepository) -> *mut *mut glib::gchar {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_irepository_get_loaded_namespaces(repository)
 }
