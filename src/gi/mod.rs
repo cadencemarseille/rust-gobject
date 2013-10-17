@@ -23,18 +23,23 @@ pub struct Repository {
 
 impl Repository {
     pub fn default() -> Repository {
-        Repository {
-            ptr: detail::g_irepository_get_default() as *detail::GIRepository,
-            owns: false
+        unsafe {
+            Repository {
+                ptr: detail::g_irepository_get_default() as *detail::GIRepository,
+                owns: false
+            }
         }
     }
 }
 
 impl Drop for Repository {
     fn drop(&mut self) {
-        if self.owns {
-            gobject::detail::g_object_unref(self.ptr as *mut detail::GIRepository as glib::gpointer);
+        unsafe {
+            if self.owns {
+                gobject::detail::g_object_unref(self.ptr as *mut detail::GIRepository as glib::gpointer);
+            }
+            self.ptr = ptr::null();
+            self.owns = false;
         }
-        self.ptr = ptr::null();
     }
 }

@@ -18,7 +18,7 @@ pub struct GIRepository {
     priv priv_: *mut GIRepositoryPrivate
 }
 
-pub fn g_irepository_get_default() -> *mut GIRepository {
+pub unsafe fn g_irepository_get_default() -> *mut GIRepository {
     #[fixed_stack_segment]; #[inline(never)];
-    unsafe { native::g_irepository_get_default() }
+    native::g_irepository_get_default()
 }

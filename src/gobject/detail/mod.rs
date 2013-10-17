@@ -26,20 +26,20 @@ pub struct GObject {
     priv qdata: *mut GData
 }
 
-pub fn g_object_ref(object: glib::gpointer) -> glib::gpointer {
+pub unsafe fn g_object_ref(object: glib::gpointer) -> glib::gpointer {
     #[fixed_stack_segment]; #[inline(never)];
     assert!(ptr::is_not_null(object));
-    unsafe { native::g_object_ref(object) }
+    native::g_object_ref(object)
 }
 
-pub fn g_object_ref_sink(object: glib::gpointer) -> glib::gpointer {
+pub unsafe fn g_object_ref_sink(object: glib::gpointer) -> glib::gpointer {
     #[fixed_stack_segment]; #[inline(never)];
     assert!(ptr::is_not_null(object));
-    unsafe { native::g_object_ref_sink(object) }
+    native::g_object_ref_sink(object)
 }
 
-pub fn g_object_unref(object: glib::gpointer) {
+pub unsafe fn g_object_unref(object: glib::gpointer) {
     #[fixed_stack_segment]; #[inline(never)];
     assert!(ptr::is_not_null(object));
-    unsafe { native::g_object_unref(object) }
+    native::g_object_unref(object)
 }
