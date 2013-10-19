@@ -11,6 +11,18 @@ use glib::detail::error::GError;
 
 #[link_args = "@GOBJECT_INTROSPECTION_LIBS@"]
 extern {
+    fn g_base_info_ref(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GIBaseInfo;
+    fn g_base_info_unref(info: *mut ::detail::GIBaseInfo);
+    fn g_base_info_get_type(info: *mut ::detail::GIBaseInfo) -> ::detail::GIInfoType;
+    fn g_base_info_get_name(info: *mut ::detail::GIBaseInfo) -> *glib::gchar;
+    fn g_base_info_get_namespace(info: *mut ::detail::GIBaseInfo) -> *glib::gchar;
+    fn g_base_info_is_deprecated(info: *mut ::detail::GIBaseInfo) -> glib::gboolean;
+    fn g_base_info_get_attribute(info: *mut ::detail::GIBaseInfo, name: *glib::gchar) -> *glib::gchar;
+    // TODO: g_base_info_iterate_attributes()
+    fn g_base_info_get_container(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GIBaseInfo;
+    fn g_base_info_get_typelib(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GITypelib;
+    fn g_base_info_equal(info1: *mut ::detail::GIBaseInfo, info2: *mut ::detail::GIBaseInfo) -> glib::gboolean;
+
     fn g_typelib_free(typelib: *mut ::detail::GITypelib);
 
     fn g_irepository_get_default() -> *mut ::detail::GIRepository;

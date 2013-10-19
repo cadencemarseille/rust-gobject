@@ -14,6 +14,92 @@ use std::libc;
 
 mod native;
 
+pub type GIInfoType = libc::c_int;
+
+pub struct GIBaseInfo;
+
+pub unsafe fn g_base_info_ref(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GIBaseInfo {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_ref(info)
+}
+
+pub unsafe fn g_base_info_unref(info: *mut ::detail::GIBaseInfo) {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_unref(info)
+}
+
+pub unsafe fn g_base_info_get_type(info: *mut ::detail::GIBaseInfo) -> ::InfoType {
+    #[fixed_stack_segment]; #[inline(never)];
+    match native::g_base_info_get_type(info) {
+        0 => ::Invalid,
+        1 => ::Function,
+        2 => ::Callback,
+        3 => ::Struct,
+        4 => ::Boxed,
+        5 => ::Enum,
+        6 => ::Flags,
+        7 => ::Object,
+        8 => ::Interface,
+        9 => ::Constant,
+        10 => ::Invalid,
+        11 => ::Union,
+        12 => ::Value,
+        13 => ::Signal,
+        14 => ::Vfunc,
+        15 => ::Property,
+        16 => ::Field,
+        17 => ::Arg,
+        18 => ::Type,
+        19 => ::Unresolved,
+        v => fail2!("unknown GIInfoType {}", v)
+    }
+}
+
+pub unsafe fn g_base_info_get_name(info: *mut ::detail::GIBaseInfo) -> *glib::gchar {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_get_name(info)
+}
+
+pub unsafe fn g_base_info_get_namespace(info: *mut ::detail::GIBaseInfo) -> *glib::gchar {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_get_namespace(info)
+}
+
+pub unsafe fn g_base_info_is_deprecated(info: *mut ::detail::GIBaseInfo) -> bool {
+    #[fixed_stack_segment]; #[inline(never)];
+    if native::g_base_info_is_deprecated(info) == 0 {
+        false
+    } else {
+        true
+    }
+}
+
+pub unsafe fn g_base_info_get_attribute(info: *mut ::detail::GIBaseInfo, name: *glib::gchar) -> *glib::gchar {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_get_attribute(info, name)
+}
+
+// TODO: g_base_info_iterate_attributes()
+
+pub unsafe fn g_base_info_get_container(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GIBaseInfo {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_get_container(info)
+}
+
+pub unsafe fn g_base_info_get_typelib(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GITypelib {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_base_info_get_typelib(info)
+}
+
+pub unsafe fn g_base_info_equal(info1: *mut ::detail::GIBaseInfo, info2: *mut ::detail::GIBaseInfo) -> bool {
+    #[fixed_stack_segment]; #[inline(never)];
+    if native::g_base_info_equal(info1, info2) == 0 {
+        false
+    } else {
+        true
+    }
+}
+
 pub struct GITypelib;
 
 pub unsafe fn g_typelib_free(typelib: *mut GITypelib) {
@@ -41,8 +127,8 @@ pub unsafe fn g_irepository_get_loaded_namespaces(repository: *GIRepository) -> 
     native::g_irepository_get_loaded_namespaces(repository)
 }
 
-pub unsafe fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace_: *glib::gchar, version: *glib::gchar, flags: &[::RepositoryLoadFlag], error: *mut *mut GError) -> *mut GITypelib {
+pub unsafe fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace: *glib::gchar, version: *glib::gchar, flags: &[::RepositoryLoadFlag], error: *mut *mut GError) -> *mut GITypelib {
     #[fixed_stack_segment]; #[inline(never)];
     let converted_flags = flags.iter().fold(0, |converted_flags, &flag| converted_flags | (flag as GIRepositoryLoadFlags));
-    native::g_irepository_require(repository, namespace_, version, converted_flags, error)
+    native::g_irepository_require(repository, namespace, version, converted_flags, error)
 }
