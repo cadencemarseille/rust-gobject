@@ -65,7 +65,7 @@ fn do_install(args: ~[~str]) {
                     Err(err_str) => fail2!("Package script error: Failed to open `{}` for reading: {}", path_to_substitute.to_str(), err_str),
                     Ok(r) => r
                 };
-                let w = match io::file_writer(&output_path, [io::Create]) {
+                let w = match io::file_writer(&output_path, [io::Create, io::Truncate]) {
                     Err(err_str) => fail2!("Package script error: Failed to open `{}` for writing: {}", output_path.to_str(), err_str),
                     Ok(w) => w
                 };
