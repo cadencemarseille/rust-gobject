@@ -9,8 +9,17 @@
 use gobject::detail::GObject;
 
 use glib;
+use glib::detail::error::GError;
+use std::libc;
 
 mod native;
+
+pub struct GITypelib;
+
+pub unsafe fn g_typelib_free(typelib: *mut GITypelib) {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_typelib_free(typelib);
+}
 
 pub struct GIRepositoryPrivate;
 
@@ -20,6 +29,8 @@ pub struct GIRepository {
     priv priv_: *mut GIRepositoryPrivate
 }
 
+pub type GIRepositoryLoadFlags = libc::c_int;
+
 pub unsafe fn g_irepository_get_default() -> *mut GIRepository {
     #[fixed_stack_segment]; #[inline(never)];
     native::g_irepository_get_default()
@@ -28,4 +39,10 @@ pub unsafe fn g_irepository_get_default() -> *mut GIRepository {
 pub unsafe fn g_irepository_get_loaded_namespaces(repository: *GIRepository) -> *mut *mut glib::gchar {
     #[fixed_stack_segment]; #[inline(never)];
     native::g_irepository_get_loaded_namespaces(repository)
+}
+
+pub unsafe fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace_: *glib::gchar, version: *glib::gchar, flags: &[::RepositoryLoadFlag], error: *mut *mut GError) -> *mut GITypelib {
+    #[fixed_stack_segment]; #[inline(never)];
+    let converted_flags = flags.iter().fold(0, |converted_flags, &flag| (converted_flags | (flag as GIRepositoryLoadFlags) as GIRepositoryLoadFlags));
+    native::g_irepository_require(repository, namespace_, version, converted_flags, error)
 }

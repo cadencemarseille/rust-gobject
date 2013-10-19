@@ -15,21 +15,72 @@ use std::util;
 
 fn print_usage(program: &str, opts: &[Opt]) {
     util::ignore(opts);
-    println!("Usage: {} [options] command [command-options] [command-arguments]", program);
-    println("Options:");
+    println!("Usage: {} [general-options] command [command-options] [command-arguments]", program);
+    println("General options:");
     println("    -h, --help          Print usage and exit");
     println("    --version           Print version information and exit");
+    println("\nCommands:");
+    println("    help                Print usage for a command and exit");
+    println("    generate            Generate Rust bindings for a GI namespace and optional version");
 }
 
 fn print_version_info() {
     println("0.1");
 }
 
-fn do_list_namespaces() {
+fn print_generate_usage(program: &str, general_opts: &[Opt], command_opts: &[Opt]) {
+    util::ignore(general_opts);
+    util::ignore(command_opts);
+    println!("Usage: {} [general-options] generate [command-options] namespace output-module", program);
+    println("Command options:");
+    println("    -h, --help          Print usage and exit");
+    println("    --version=VERS      (optional) Require version VERS of the namespace");
+}
+
+fn do_generate(program: &str, general_opts: &[Opt], args: ~[~str]) {
+    let opts = ~[
+        optflag("h"),
+        optflag("help"),
+        optopt("version")
+    ];
+
+    let matches = match getopts(args.tail(), opts) {
+        Err(f) => {
+            println!("Error: {}", f.to_err_msg());
+            os::set_exit_status(1);
+            return;
+        },
+        Ok(m) => m
+    };
+
+    if matches.opt_present("h") || matches.opt_present("help") {
+        print_generate_usage(program, general_opts, opts);
+        return;
+    }
+
+    if matches.free.len() == 0 {
+        println("Error: No GI namespace");
+        os::set_exit_status(1);
+        return;
+    } else if matches.free.len() == 1 {
+        println("Error: No output module name");
+        os::set_exit_status(1);
+        return;
+    }
+
+    let opt_version = matches.opt_str("version");
+    let namespace = matches.free[0];
+
     let repository = gi::Repository::default();
-    let namespaces = repository.loaded_namespaces();
-    for namespace in namespaces.iter() {
-        println(*namespace);
+
+    // TODO: `opt_version.as_ref()`
+    let require_res = repository.require(namespace, opt_version.map(|s| s.as_slice()), []);
+    match require_res {
+        Err(error) => {
+            println!("Error: Failed to load namespace '{}': {}", namespace, error.message());
+        },
+        Ok(typelib) => {
+        }
     }
 }
 
@@ -43,7 +94,7 @@ fn main() {
         optflag("version")
     ];
 
-    let opt_matches = match getopts(args.tail(), opts) {
+    let matches = match getopts(args.tail(), opts) {
         Err(f) => {
             println!("Error: {}", f.to_err_msg());
             os::set_exit_status(1);
@@ -52,26 +103,26 @@ fn main() {
         Ok(m) => m
     };
 
-    if opt_matches.opt_present("h") || opt_matches.opt_present("help") {
+    if matches.opt_present("h") || matches.opt_present("help") {
         print_usage(program, opts);
         return;
     }
 
-    if opt_matches.opt_present("version") {
+    if matches.opt_present("version") {
         print_version_info();
         return;
     }
 
-    if opt_matches.free.len() == 0 {
+    if matches.free.len() == 0 {
         println("Error: No command");
         os::set_exit_status(1);
         return;
     }
 
-    let command = opt_matches.free[0].clone();
+    let command = matches.free[0].clone();
 
-    if command == ~"list-namespaces" {
-        do_list_namespaces();
+    if command == ~"gen" || command == ~"generate" {
+        do_generate(program, opts, matches.free.clone());
     } else {
         println!("Error: Unknown command '{}'", command);
         os::set_exit_status(1);
