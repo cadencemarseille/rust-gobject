@@ -43,6 +43,6 @@ pub unsafe fn g_irepository_get_loaded_namespaces(repository: *GIRepository) -> 
 
 pub unsafe fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace_: *glib::gchar, version: *glib::gchar, flags: &[::RepositoryLoadFlag], error: *mut *mut GError) -> *mut GITypelib {
     #[fixed_stack_segment]; #[inline(never)];
-    let converted_flags = flags.iter().fold(0, |converted_flags, &flag| (converted_flags | (flag as GIRepositoryLoadFlags) as GIRepositoryLoadFlags));
+    let converted_flags = flags.iter().fold(0, |converted_flags, &flag| converted_flags | (flag as GIRepositoryLoadFlags));
     native::g_irepository_require(repository, namespace_, version, converted_flags, error)
 }
