@@ -15,11 +15,13 @@ extern mod gobject;
 use glib::detail::error::GError;
 use glib::strfuncs::Strdupv;
 use std::c_str::CString;
+use std::cast;
 use std::libc;
 use std::option::Option;
 use std::ptr;
 use std::result::Result;
 use std::str;
+use std::unstable::raw::Slice;
 
 mod detail;
 
@@ -95,6 +97,22 @@ impl BaseInfo {
             } else {
                 Some(str::raw::from_c_str(name_c_str))
             }
+        }
+    }
+
+    pub unsafe fn raw_name(&self) -> Option<&str> {
+        let name_c_str = detail::g_base_info_get_name(self.ptr);
+        if ptr::is_null(name_c_str) {
+            None
+        } else {
+            let mut name_len = 0u;
+            while *ptr::offset(name_c_str, name_len as int) != 0 {
+                name_len += 1;
+            }
+            Some(cast::transmute(Slice {
+                data: name_c_str,
+                len: name_len
+            }))
         }
     }
 

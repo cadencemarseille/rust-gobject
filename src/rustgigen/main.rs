@@ -91,17 +91,19 @@ fn do_dump(program: &str, general_opts: &[Opt], args: ~[~str]) {
     println!("n_infos = {}", n_infos);
     let mut i: glib::gint = 0;
     while i < n_infos {
-        let info = repository.info(&namespace_cstring, i);
-        let info_type = info.type_();
-        let opt_name = info.name();
-        match opt_name {
-            None => println!("\n{}: ({})", i, info_type.to_str()),
-            Some(name) => println!("\n{}: {} ({})", i, name, info_type.to_str()),
+        unsafe {
+            let info = repository.info(&namespace_cstring, i);
+            let info_type = info.type_();
+            let opt_name = info.raw_name();
+            match opt_name {
+                None => println!("\n{}: ({})", i, info_type.to_str()),
+                Some(name) => println!("\n{}: {} ({})", i, name, info_type.to_str()),
+            }
+            for (name, value) in info.attribute_iter() {
+                println!("{} => {}", name, value);
+            }
+            i = i + 1;
         }
-        for (name, value) in info.attribute_iter() {
-            println!("{} => {}", name, value);
-        }
-        i = i + 1;
     }
 }
 
