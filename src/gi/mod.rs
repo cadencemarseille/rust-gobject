@@ -14,6 +14,7 @@ extern mod gobject;
 
 use glib::detail::error::GError;
 use glib::strfuncs::Strdupv;
+use std::c_str::CString;
 use std::libc;
 use std::option::Option;
 use std::ptr;
@@ -50,6 +51,7 @@ impl Iterator<(~str, ~str)> for AttributeIter {
     }
 }
 
+#[deriving(ToStr)]
 pub enum InfoType {
     Invalid = 0,
     Function = 1,
@@ -185,6 +187,7 @@ pub struct Repository {
     priv owns: bool
 }
 
+#[deriving(ToStr)]
 pub enum RepositoryLoadFlag {
     Lazy = 1
 }
@@ -199,10 +202,21 @@ impl Repository {
         }
     }
 
+    pub fn info(&self, namespace_cstring: &CString, index: glib::gint) -> BaseInfo {
+        unsafe {
+            do namespace_cstring.with_ref |namespace_c_str| {
+                BaseInfo {
+                    ptr: detail::g_irepository_get_info(self.ptr, namespace_c_str, index),
+                    owns: true
+                }
+            }
+        }
+    }
+
     pub fn loaded_namespaces(&self) -> ~[~str] {
         unsafe {
             let mut res: ~[~str] = ~[];
-            let mut namespaces_strdupv = Strdupv::new(detail::g_irepository_get_loaded_namespaces(self.ptr as *detail::GIRepository));
+            let mut namespaces_strdupv = Strdupv::new(detail::g_irepository_get_loaded_namespaces(self.ptr));
             do namespaces_strdupv.with_mut_ptr |namespaces_array| {
                 let mut p = namespaces_array;
                 loop {
@@ -215,6 +229,14 @@ impl Repository {
                 }
             };
             res
+        }
+    }
+
+    pub fn n_infos(&self, namespace_cstring: &CString) -> glib::gint {
+        unsafe {
+            do namespace_cstring.with_ref |namespace_c_str| {
+                detail::g_irepository_get_n_infos(self.ptr, namespace_c_str)
+            }
         }
     }
 

@@ -148,13 +148,23 @@ pub unsafe fn g_irepository_get_default() -> *mut GIRepository {
     native::g_irepository_get_default()
 }
 
-pub unsafe fn g_irepository_get_loaded_namespaces(repository: *GIRepository) -> *mut *mut glib::gchar {
-    #[fixed_stack_segment]; #[inline(never)];
-    native::g_irepository_get_loaded_namespaces(repository)
-}
-
 pub unsafe fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace: *glib::gchar, version: *glib::gchar, flags: &[::RepositoryLoadFlag], error: *mut *mut GError) -> *mut GITypelib {
     #[fixed_stack_segment]; #[inline(never)];
     let converted_flags = flags.iter().fold(0, |converted_flags, &flag| converted_flags | (flag as GIRepositoryLoadFlags));
     native::g_irepository_require(repository, namespace, version, converted_flags, error)
+}
+
+pub unsafe fn g_irepository_get_loaded_namespaces(repository: *mut GIRepository) -> *mut *mut glib::gchar {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_irepository_get_loaded_namespaces(repository)
+}
+
+pub unsafe fn g_irepository_get_n_infos(repository: *mut ::detail::GIRepository, namespace: *glib::gchar) -> glib::gint {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_irepository_get_n_infos(repository, namespace)
+}
+
+pub unsafe fn g_irepository_get_info(repository: *mut ::detail::GIRepository, namespace: *glib::gchar, index: glib::gint) -> *mut ::detail::GIBaseInfo {
+    #[fixed_stack_segment]; #[inline(never)];
+    native::g_irepository_get_info(repository, namespace, index)
 }

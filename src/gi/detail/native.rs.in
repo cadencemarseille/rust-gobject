@@ -27,6 +27,8 @@ extern {
     fn g_typelib_free(typelib: *mut ::detail::GITypelib);
 
     fn g_irepository_get_default() -> *mut ::detail::GIRepository;
-    fn g_irepository_get_loaded_namespaces(repository: *::detail::GIRepository) -> *mut *mut glib::gchar;
-    fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace_: *glib::gchar, version: *glib::gchar, flags: ::detail::GIRepositoryLoadFlags, error: *mut *mut GError) -> *mut ::detail::GITypelib;
+    fn g_irepository_require(repository: *mut ::detail::GIRepository, namespace: *glib::gchar, version: *glib::gchar, flags: ::detail::GIRepositoryLoadFlags, error: *mut *mut GError) -> *mut ::detail::GITypelib;
+    fn g_irepository_get_loaded_namespaces(repository: *mut ::detail::GIRepository) -> *mut *mut glib::gchar;
+    fn g_irepository_get_n_infos(repository: *mut ::detail::GIRepository, namespace: *glib::gchar) -> glib::gint;
+    fn g_irepository_get_info(repository: *mut ::detail::GIRepository, namespace: *glib::gchar, index: glib::gint) -> *mut ::detail::GIBaseInfo;
 }
