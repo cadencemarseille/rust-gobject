@@ -8,6 +8,7 @@
 
 extern mod extra;
 extern mod gi;
+extern mod glib;
 
 use extra::getopts::*;
 use std::os;
@@ -15,29 +16,30 @@ use std::util;
 
 fn print_usage(program: &str, opts: &[Opt]) {
     util::ignore(opts);
-    println!("Usage: {} [general-options] command [command-options] [command-arguments]", program);
+    println!("Usage: {} [general-options] command -- [command-options] [command-arguments]", program);
     println("General options:");
     println("    -h, --help          Print usage and exit");
     println("    --version           Print version information and exit");
     println("\nCommands:");
     println("    help                Print usage for a command and exit");
-    println("    generate            Generate Rust bindings for a GI namespace and optional version");
+    println("    dump                Dump a GI namespace");
+    println("    generate            Generate Rust bindings for a GI namespace");
 }
 
 fn print_version_info() {
     println("0.1");
 }
 
-fn print_generate_usage(program: &str, general_opts: &[Opt], command_opts: &[Opt]) {
+fn print_dump_usage(program: &str, general_opts: &[Opt], command_opts: &[Opt]) {
     util::ignore(general_opts);
     util::ignore(command_opts);
-    println!("Usage: {} [general-options] generate [command-options] namespace output-module", program);
+    println!("Usage: {} [general-options] dump -- [command-options] namespace", program);
     println("Command options:");
     println("    -h, --help          Print usage and exit");
     println("    --version=VERS      (optional) Require version VERS of the namespace");
 }
 
-fn do_generate(program: &str, general_opts: &[Opt], args: ~[~str]) {
+fn do_dump(program: &str, general_opts: &[Opt], args: ~[~str]) {
     let opts = ~[
         optflag("h"),
         optflag("help"),
@@ -54,16 +56,12 @@ fn do_generate(program: &str, general_opts: &[Opt], args: ~[~str]) {
     };
 
     if matches.opt_present("h") || matches.opt_present("help") {
-        print_generate_usage(program, general_opts, opts);
+        print_dump_usage(program, general_opts, opts);
         return;
     }
 
     if matches.free.len() == 0 {
         println("Error: No GI namespace");
-        os::set_exit_status(1);
-        return;
-    } else if matches.free.len() == 1 {
-        println("Error: No output module name");
         os::set_exit_status(1);
         return;
     }
@@ -75,12 +73,35 @@ fn do_generate(program: &str, general_opts: &[Opt], args: ~[~str]) {
 
     // TODO: `opt_version.as_ref()`
     let require_res = repository.require(namespace, opt_version.map(|s| s.as_slice()), []);
-    match require_res {
+    let typelib = match require_res {
         Err(error) => {
-            println!("Error: Failed to load namespace '{}': {}", namespace, error.message());
+            match opt_version {
+                None => println!("Error: Failed to load namespace '{}': {}", namespace, error.message()),
+                Some(version) => println!("Error: Failed to load namespace '{}' at version {}: {}", namespace, version, error.message())
+            }
+            os::set_exit_status(1);
+            return;
         },
-        Ok(typelib) => {
+        Ok(typelib) => typelib
+    };
+    util::ignore(typelib);
+
+    let namespace_cstring = namespace.to_c_str();
+    let n_infos = repository.n_infos(&namespace_cstring);
+    println!("n_infos = {}", n_infos);
+    let mut i: glib::gint = 0;
+    while i < n_infos {
+        let info = repository.info(&namespace_cstring, i);
+        let info_type = info.type_();
+        let opt_name = info.name();
+        match opt_name {
+            None => println!("\n{}: ({})", i, info_type.to_str()),
+            Some(name) => println!("\n{}: {} ({})", i, name, info_type.to_str()),
         }
+        for (name, value) in info.attribute_iter() {
+            println!("{} => {}", name, value);
+        }
+        i = i + 1;
     }
 }
 
@@ -121,8 +142,16 @@ fn main() {
 
     let command = matches.free[0].clone();
 
-    if command == ~"gen" || command == ~"generate" {
-        do_generate(program, opts, matches.free.clone());
+    if command == ~"help" {
+        println("Error: The 'help' command is unimplemented.");
+        os::set_exit_status(1);
+        return;
+    } else if command == ~"dump" {
+        do_dump(program, opts, matches.free.clone());
+    } else if command == ~"gen" || command == ~"generate" {
+        println("Error: The 'generate' command is unimplemented.");
+        os::set_exit_status(1);
+        return;
     } else {
         println!("Error: Unknown command '{}'", command);
         os::set_exit_status(1);
