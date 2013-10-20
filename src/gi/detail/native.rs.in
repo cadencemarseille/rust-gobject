@@ -8,6 +8,7 @@
 
 use glib;
 use glib::detail::error::GError;
+use std::libc;
 
 #[link_args = "@GOBJECT_INTROSPECTION_LIBS@"]
 extern {
@@ -18,7 +19,7 @@ extern {
     fn g_base_info_get_namespace(info: *mut ::detail::GIBaseInfo) -> *glib::gchar;
     fn g_base_info_is_deprecated(info: *mut ::detail::GIBaseInfo) -> glib::gboolean;
     fn g_base_info_get_attribute(info: *mut ::detail::GIBaseInfo, name: *glib::gchar) -> *glib::gchar;
-    // TODO: g_base_info_iterate_attributes()
+    fn g_base_info_iterate_attributes(info: *mut ::detail::GIBaseInfo, iterator: *mut ::detail::GIAttributeIter, name: *mut *libc::c_char, value: *mut *libc::c_char) -> glib::gboolean;
     fn g_base_info_get_container(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GIBaseInfo;
     fn g_base_info_get_typelib(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GITypelib;
     fn g_base_info_equal(info1: *mut ::detail::GIBaseInfo, info2: *mut ::detail::GIBaseInfo) -> glib::gboolean;

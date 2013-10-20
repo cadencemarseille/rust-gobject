@@ -14,12 +14,41 @@ extern mod gobject;
 
 use glib::detail::error::GError;
 use glib::strfuncs::Strdupv;
+use std::libc;
 use std::option::Option;
 use std::ptr;
 use std::result::Result;
 use std::str;
 
 mod detail;
+
+pub struct AttributeIter {
+    priv ptr: *mut detail::GIBaseInfo,
+    priv it: detail::GIAttributeIter
+}
+
+impl Drop for AttributeIter {
+    fn drop(&mut self) {
+        unsafe {
+            detail::g_base_info_unref(self.ptr);
+            self.ptr = ptr::mut_null();
+        }
+    }
+}
+
+impl Iterator<(~str, ~str)> for AttributeIter {
+    fn next(&mut self) -> Option<(~str, ~str)> {
+        unsafe {
+            let mut name_c_str: *libc::c_char = ptr::null();
+            let mut value_c_str: *libc::c_char = ptr::null();
+            if !detail::g_base_info_iterate_attributes(self.ptr, &mut self.it, &mut name_c_str, &mut value_c_str) {
+                None
+            } else {
+                Some((str::raw::from_c_str(name_c_str), str::raw::from_c_str(value_c_str)))
+            }
+        }
+    }
+}
 
 pub enum InfoType {
     Invalid = 0,
@@ -89,6 +118,15 @@ impl BaseInfo {
                 } else {
                     Some(str::raw::from_c_str(attribute_c_str))
                 }
+            }
+        }
+    }
+
+    pub fn attribute_iter(&self) -> AttributeIter {
+        unsafe {
+            AttributeIter {
+                ptr: detail::g_base_info_ref(self.ptr),
+                it: detail::GIAttributeIter::new()
             }
         }
     }

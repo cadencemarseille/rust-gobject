@@ -11,8 +11,27 @@ use gobject::detail::GObject;
 use glib;
 use glib::detail::error::GError;
 use std::libc;
+use std::ptr;
 
 mod native;
+
+pub struct GIAttributeIter {
+    priv data: glib::gpointer,
+    priv data2: glib::gpointer,
+    priv data3: glib::gpointer,
+    priv data4: glib::gpointer
+}
+
+impl GIAttributeIter {
+    pub fn new() -> GIAttributeIter {
+        GIAttributeIter {
+            data: ptr::mut_null(),
+            data2: ptr::mut_null(),
+            data3: ptr::mut_null(),
+            data4: ptr::mut_null()
+        }
+    }
+}
 
 pub type GIInfoType = libc::c_int;
 
@@ -79,7 +98,14 @@ pub unsafe fn g_base_info_get_attribute(info: *mut ::detail::GIBaseInfo, name: *
     native::g_base_info_get_attribute(info, name)
 }
 
-// TODO: g_base_info_iterate_attributes()
+pub unsafe fn g_base_info_iterate_attributes(info: *mut ::detail::GIBaseInfo, iterator: *mut ::detail::GIAttributeIter, name: *mut *libc::c_char, value: *mut *libc::c_char) -> bool {
+    #[fixed_stack_segment]; #[inline(never)];
+    if native::g_base_info_iterate_attributes(info, iterator, name, value) == 0 {
+        false
+    } else {
+        true
+    }
+}
 
 pub unsafe fn g_base_info_get_container(info: *mut ::detail::GIBaseInfo) -> *mut ::detail::GIBaseInfo {
     #[fixed_stack_segment]; #[inline(never)];
