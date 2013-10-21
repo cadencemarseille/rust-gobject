@@ -100,6 +100,7 @@ impl BaseInfo {
         }
     }
 
+    #[inline]
     pub unsafe fn raw_name(&self) -> Option<&str> {
         let name_c_str = detail::g_base_info_get_name(self.ptr);
         if ptr::is_null(name_c_str) {
