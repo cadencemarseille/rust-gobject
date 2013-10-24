@@ -11,21 +11,6 @@ use std::ptr;
 
 mod native;
 
-pub type GType = glib::gsize;
-
-pub struct GData;
-
-pub struct GTypeClass {
-    priv g_type: GType
-}
-
-pub struct GObject {
-    g_type_instance: GTypeClass,
-
-    priv ref_count: glib::guint,
-    priv qdata: *mut GData
-}
-
 pub unsafe fn g_object_ref(object: glib::gpointer) -> glib::gpointer {
     #[fixed_stack_segment]; #[inline(never)];
     assert!(ptr::is_not_null(object));

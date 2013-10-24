@@ -6,8 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use gobject::detail::GObject;
-
+use gobject::GObject;
 use glib;
 use glib::detail::error::GError;
 use std::libc;
