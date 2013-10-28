@@ -25,9 +25,27 @@ use std::unstable::raw::Slice;
 
 mod detail;
 
+pub struct GIAttributeIter {
+    priv data: glib::gpointer,
+    priv data2: glib::gpointer,
+    priv data3: glib::gpointer,
+    priv data4: glib::gpointer
+}
+
+impl GIAttributeIter {
+    pub fn new() -> GIAttributeIter {
+        GIAttributeIter {
+            data: ptr::mut_null(),
+            data2: ptr::mut_null(),
+            data3: ptr::mut_null(),
+            data4: ptr::mut_null()
+        }
+    }
+}
+
 pub struct AttributeIter {
     priv ptr: *mut detail::GIBaseInfo,
-    priv it: detail::GIAttributeIter
+    priv it: GIAttributeIter
 }
 
 impl Drop for AttributeIter {
@@ -146,8 +164,8 @@ impl BaseInfo {
     pub fn attribute_iter(&self) -> AttributeIter {
         unsafe {
             AttributeIter {
-                ptr: detail::g_base_info_ref(self.ptr),
-                it: detail::GIAttributeIter::new()
+                ptr: { detail::g_base_info_ref(self.ptr); self.ptr },
+                it: GIAttributeIter::new()
             }
         }
     }
